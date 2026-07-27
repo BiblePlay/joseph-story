@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="ko">
+
 <head>
 <meta charset="utf-8">
 
@@ -13,6 +14,10 @@
 <title>요셉과 형제들</title>
 
 <style>
+
+/* =========================
+   기본
+========================= */
 
 *{
   box-sizing:border-box;
@@ -58,9 +63,7 @@ body{
   margin:0 auto;
 
   display:grid;
-
-  grid-template-columns:
-    repeat(5,1fr);
+  grid-template-columns:repeat(5,1fr);
 
   gap:5px;
 }
@@ -86,29 +89,16 @@ body{
 
   outline:none;
 
-  -webkit-tap-highlight-color:
-    transparent;
+  -webkit-tap-highlight-color:transparent;
 
   touch-action:manipulation;
 }
-
-
-/* 현재 보고 있는 화 */
 
 .episode-button.active{
   background:#111;
   color:#fff;
   border-color:#111;
 }
-
-
-/*
-중요:
-모바일 브라우저가 터치 순간
-임의의 버튼 상태를 표시하지 않도록
-hover / focus / active에서
-색을 변경하지 않는다.
-*/
 
 .episode-button:focus{
   outline:none;
@@ -124,7 +114,7 @@ hover / focus / active에서
 
 
 /* =========================
-   만화 영역
+   만화
 ========================= */
 
 .reader{
@@ -151,7 +141,7 @@ hover / focus / active에서
 
 
 /* =========================
-   하단
+   하단 영역
 ========================= */
 
 .episode-end{
@@ -159,14 +149,23 @@ hover / focus / active에서
 
   margin:0 auto;
 
-  padding:
-    22px 14px 8px;
+  padding:22px 14px 8px;
 
   background:#fff;
 }
 
 
-/* 다음 화 */
+/*
+회차 전환 중에는
+하단 버튼 영역을 완전히 숨김
+*/
+
+.episode-end.switching{
+  visibility:hidden;
+}
+
+
+/* 다음 화 버튼 */
 
 .next-episode{
   appearance:none;
@@ -194,8 +193,7 @@ hover / focus / active에서
 
   outline:none;
 
-  -webkit-tap-highlight-color:
-    transparent;
+  -webkit-tap-highlight-color:transparent;
 
   touch-action:manipulation;
 }
@@ -209,7 +207,7 @@ hover / focus / active에서
 }
 
 
-/* 마지막 화 */
+/* 마지막 */
 
 .the-end{
   text-align:center;
@@ -237,8 +235,7 @@ hover / focus / active에서
 
   letter-spacing:.02em;
 
-  padding:
-    22px 10px 30px;
+  padding:22px 10px 30px;
 }
 
 
@@ -258,8 +255,7 @@ hover / focus / active에서
   }
 
   .reader{
-    box-shadow:
-      0 0 0 1px #eee;
+    box-shadow:0 0 0 1px #eee;
   }
 
 }
@@ -354,7 +350,7 @@ hover / focus / active에서
 
 
 <!-- =========================
-     다음 화
+     하단
 ========================= -->
 
 <div
@@ -374,9 +370,7 @@ hover / focus / active에서
 
 
 <footer class="footer">
-
 부산진교회 초등2부
-
 </footer>
 
 
@@ -386,51 +380,32 @@ hover / focus / active에서
    브라우저 스크롤 복원 방지
 ========================= */
 
-if(
-  'scrollRestoration'
-  in history
-){
-  history.scrollRestoration =
-    'manual';
+if('scrollRestoration' in history){
+  history.scrollRestoration='manual';
 }
 
 
 /* =========================
-   요소
+   기본 설정
 ========================= */
 
-const total = 5;
+const total=5;
 
-let currentEpisode = 1;
+let currentEpisode=1;
 
-let changing = false;
-
-
-const reader =
-  document.getElementById(
-    'reader'
-  );
+let changing=false;
 
 
-const page1 =
-  document.getElementById(
-    'page1'
-  );
+const page1=
+  document.getElementById('page1');
 
+const page2=
+  document.getElementById('page2');
 
-const page2 =
-  document.getElementById(
-    'page2'
-  );
+const episodeEnd=
+  document.getElementById('episodeEnd');
 
-
-const episodeEnd =
-  document.getElementById(
-    'episodeEnd'
-  );
-
-
-const buttons =
+const buttons=
   Array.from(
     document.querySelectorAll(
       '.episode-button'
@@ -439,28 +414,24 @@ const buttons =
 
 
 /* =========================
-   이미지 주소
+   이미지 파일명
 ========================= */
 
 function getSources(ep){
 
-  const number =
-    String(ep)
-    .padStart(2,'0');
+  const number=
+    String(ep).padStart(2,'0');
 
   return [
-
-    number + '-1.png',
-
-    number + '-2.png'
-
+    number+'-1.png',
+    number+'-2.png'
   ];
 
 }
 
 
 /* =========================
-   이미지 미리 준비
+   이미지 미리 로딩
 ========================= */
 
 function preload(src){
@@ -468,30 +439,20 @@ function preload(src){
   return new Promise(
     function(resolve,reject){
 
-      const image =
-        new Image();
+      const image=new Image();
 
-      image.onload =
-        function(){
+      image.onload=function(){
+        resolve();
+      };
 
-          resolve();
+      image.onerror=function(){
+        reject();
+      };
 
-        };
-
-      image.onerror =
-        function(){
-
-          reject();
-
-        };
-
-      image.src = src;
-
+      image.src=src;
 
       if(image.complete){
-
         resolve();
-
       }
 
     }
@@ -501,10 +462,7 @@ function preload(src){
 
 
 /* =========================
-   선택된 회차 표시
-
-   버튼을 새로 만들지 않는다.
-   기존 버튼의 class만 변경.
+   현재 화 버튼 표시
 ========================= */
 
 function setActiveButton(ep){
@@ -512,12 +470,12 @@ function setActiveButton(ep){
   buttons.forEach(
     function(button){
 
-      const number =
+      const number=
         Number(
           button.dataset.episode
         );
 
-      if(number === ep){
+      if(number===ep){
 
         button.classList.add(
           'active'
@@ -531,11 +489,6 @@ function setActiveButton(ep){
 
       }
 
-      /*
-      모바일 브라우저의
-      focus 잔상 제거
-      */
-
       button.blur();
 
     }
@@ -545,50 +498,39 @@ function setActiveButton(ep){
 
 
 /* =========================
-   하단 버튼
+   하단 다음 화 버튼
 ========================= */
 
 function updateBottom(ep){
 
-  if(ep < total){
+  if(ep<total){
 
-    episodeEnd.innerHTML =
-      '<button ' +
-      'type="button" ' +
-      'class="next-episode" ' +
-      'id="nextEpisode">' +
-
-      (ep + 1) +
-
-      '화 보기 →' +
-
+    episodeEnd.innerHTML=
+      '<button '+
+      'type="button" '+
+      'class="next-episode" '+
+      'id="nextEpisode">'+
+      (ep+1)+
+      '화 보기 →'+
       '</button>';
 
 
-    const next =
-      document.getElementById(
-        'nextEpisode'
+    document
+      .getElementById('nextEpisode')
+      .addEventListener(
+        'click',
+        function(){
+
+          changeEpisode(ep+1);
+
+        }
       );
 
+  }else{
 
-    next.addEventListener(
-      'click',
-      function(){
-
-        changeEpisode(
-          ep + 1
-        );
-
-      }
-    );
-
-  }
-
-  else{
-
-    episodeEnd.innerHTML =
-      '<div class="the-end">' +
-      '요셉과 형제들 · 끝' +
+    episodeEnd.innerHTML=
+      '<div class="the-end">'+
+      '요셉과 형제들 · 끝'+
       '</div>';
 
   }
@@ -604,26 +546,39 @@ async function changeEpisode(ep){
 
   if(
     changing ||
-    ep < 1 ||
-    ep > total ||
-    ep === currentEpisode
+    ep<1 ||
+    ep>total ||
+    ep===currentEpisode
   ){
     return;
   }
 
 
-  changing = true;
+  changing=true;
 
 
-  const sources =
+  /*
+  ★ 핵심 수정
+
+  회차 이동이 시작되는 순간
+  검은 '다음 화 보기' 버튼을
+  먼저 숨긴다.
+  */
+
+  episodeEnd.classList.add(
+    'switching'
+  );
+
+
+  const sources=
     getSources(ep);
 
 
   try{
 
     /*
-    새 화 이미지가 준비될 때까지
-    현재 화면 유지
+    현재 화면을 유지한 상태에서
+    새 이미지 두 장을 먼저 준비
     */
 
     await Promise.all([
@@ -636,61 +591,70 @@ async function changeEpisode(ep){
 
 
     /*
-    먼저 최상단으로 이동
+    화면 최상단으로 이동
     */
 
     window.scrollTo(0,0);
 
 
     /*
-    기존 IMG 요소 자체는
-    없애지 않고 src만 변경
+    기존 IMG 요소는 그대로 두고
+    이미지 주소만 교체
     */
 
-    page1.src =
-      sources[0];
+    page1.src=sources[0];
 
-    page1.alt =
-      ep +
-      '화 1페이지';
+    page1.alt=
+      ep+'화 1페이지';
 
 
-    page2.src =
-      sources[1];
+    page2.src=sources[1];
 
-    page2.alt =
-      ep +
-      '화 2페이지';
+    page2.alt=
+      ep+'화 2페이지';
 
 
-    currentEpisode = ep;
+    currentEpisode=ep;
 
 
     /*
-    검은 버튼 이동
+    상단 검은 회차 표시 변경
     */
 
     setActiveButton(ep);
 
 
     /*
-    하단 버튼 변경
+    새로운 다음 화 버튼 준비
     */
 
     updateBottom(ep);
 
 
     /*
-    모바일 렌더링 후
-    위치 재확인
+    브라우저가 새 레이아웃을
+    실제로 그린 다음 처리
     */
 
     requestAnimationFrame(
       function(){
 
-        window.scrollTo(
-          0,
-          0
+        window.scrollTo(0,0);
+
+
+        requestAnimationFrame(
+          function(){
+
+            /*
+            ★ 새 화면이 자리 잡은 뒤에만
+            하단 버튼을 다시 표시
+            */
+
+            episodeEnd.classList.remove(
+              'switching'
+            );
+
+          }
         );
 
       }
@@ -705,19 +669,24 @@ async function changeEpisode(ep){
       error
     );
 
+    /*
+    오류가 나도 버튼은 다시 표시
+    */
+
+    episodeEnd.classList.remove(
+      'switching'
+    );
+
   }
 
 
-  changing = false;
+  changing=false;
 
 }
 
 
 /* =========================
-   상단 버튼 이벤트
-
-   버튼은 처음 만들어진
-   그대로 계속 사용
+   상단 회차 버튼
 ========================= */
 
 buttons.forEach(
@@ -727,7 +696,7 @@ buttons.forEach(
       'click',
       function(){
 
-        const ep =
+        const ep=
           Number(
             button.dataset.episode
           );
@@ -742,7 +711,23 @@ buttons.forEach(
 
 
 /* =========================
-   2~5화 백그라운드 준비
+   최초 다음 화 버튼
+========================= */
+
+document
+  .getElementById('nextEpisode')
+  .addEventListener(
+    'click',
+    function(){
+
+      changeEpisode(2);
+
+    }
+  );
+
+
+/* =========================
+   나머지 이미지 미리 로딩
 ========================= */
 
 window.addEventListener(
@@ -761,7 +746,7 @@ window.addEventListener(
           ep++
         ){
 
-          const sources =
+          const sources=
             getSources(ep);
 
           preload(
@@ -787,20 +772,16 @@ window.addEventListener(
 
 
 /* =========================
-   예전 hash 제거
+   이전 hash 제거
 ========================= */
 
 if(location.hash){
 
   history.replaceState(
-
     null,
-
     '',
-
-    location.pathname +
+    location.pathname+
     location.search
-
   );
 
 }
@@ -810,14 +791,13 @@ if(location.hash){
    첫 화면
 ========================= */
 
-currentEpisode = 1;
+currentEpisode=1;
 
 setActiveButton(1);
 
 window.scrollTo(0,0);
 
 </script>
-
 
 </body>
 </html>
