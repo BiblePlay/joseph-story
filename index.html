@@ -2,12 +2,18 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1,viewport-fit=cover"
+>
+
 <meta name="theme-color" content="#ffffff">
 
 <title>요셉과 형제들</title>
 
 <style>
+
 *{
   box-sizing:border-box;
 }
@@ -20,6 +26,7 @@ body{
   margin:0;
   background:#fff;
   color:#111;
+
   font-family:
     -apple-system,
     BlinkMacSystemFont,
@@ -29,109 +36,216 @@ body{
     sans-serif;
 }
 
-/* 상단 회차 메뉴 */
+
+/* =========================
+   상단 회차 메뉴
+========================= */
+
 .top{
   position:sticky;
   top:0;
   z-index:100;
+
   background:#fff;
+
   border-bottom:1px solid #e8e8e8;
+
   padding:8px;
 }
 
 .episodes{
   max-width:860px;
-  margin:auto;
+  margin:0 auto;
+
   display:grid;
-  grid-template-columns:repeat(5,1fr);
+
+  grid-template-columns:
+    repeat(5,1fr);
+
   gap:5px;
 }
 
-.episodes button{
+.episode-button{
+  appearance:none;
+  -webkit-appearance:none;
+
   border:1px solid #d7d7d7;
+
   background:#fff;
+  color:#111;
+
   border-radius:9px;
+
   padding:9px 2px;
+
+  font-family:inherit;
   font-size:14px;
   font-weight:650;
+
   cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
+
+  outline:none;
+
+  -webkit-tap-highlight-color:
+    transparent;
+
+  touch-action:manipulation;
 }
 
-.episodes button.active{
+
+/* 현재 보고 있는 화 */
+
+.episode-button.active{
   background:#111;
   color:#fff;
   border-color:#111;
 }
 
-.episodes button:disabled{
-  cursor:default;
+
+/*
+중요:
+모바일 브라우저가 터치 순간
+임의의 버튼 상태를 표시하지 않도록
+hover / focus / active에서
+색을 변경하지 않는다.
+*/
+
+.episode-button:focus{
+  outline:none;
 }
 
-/* 만화 */
+.episode-button:focus-visible{
+  outline:none;
+}
+
+.episode-button:active{
+  transform:none;
+}
+
+
+/* =========================
+   만화 영역
+========================= */
+
 .reader{
   max-width:860px;
+
   margin:0 auto;
+
   background:#fff;
+
   min-height:100vh;
 }
 
 .page{
   display:block;
+
   width:100%;
   height:auto;
+
   margin:0;
   padding:0;
+
+  border:0;
 }
 
-/* 화 마지막 */
+
+/* =========================
+   하단
+========================= */
+
 .episode-end{
   max-width:860px;
+
   margin:0 auto;
-  padding:22px 14px 8px;
+
+  padding:
+    22px 14px 8px;
+
   background:#fff;
 }
 
-/* 다음 화 버튼 */
+
+/* 다음 화 */
+
 .next-episode{
+  appearance:none;
+  -webkit-appearance:none;
+
   display:block;
+
   width:100%;
+
   border:0;
+
   background:#111;
   color:#fff;
+
   border-radius:12px;
+
   padding:17px 10px;
+
+  font-family:inherit;
+
   font-size:18px;
   font-weight:700;
+
   cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
+
+  outline:none;
+
+  -webkit-tap-highlight-color:
+    transparent;
+
+  touch-action:manipulation;
 }
 
-.next-episode:disabled{
-  opacity:.65;
-  cursor:default;
+.next-episode:focus{
+  outline:none;
 }
 
-/* 마지막 */
+.next-episode:active{
+  transform:none;
+}
+
+
+/* 마지막 화 */
+
 .the-end{
   text-align:center;
+
   padding:10px 10px 4px;
+
   font-size:16px;
   font-weight:650;
+
   color:#555;
 }
 
-/* 교회명 */
+
+/* =========================
+   교회명
+========================= */
+
 .footer{
   text-align:center;
+
   color:#777;
+
   font-size:16px;
   font-weight:500;
+
   letter-spacing:.02em;
-  padding:22px 10px 30px;
+
+  padding:
+    22px 10px 30px;
 }
 
-/* PC */
+
+/* =========================
+   PC
+========================= */
+
 @media(min-width:861px){
 
   body{
@@ -144,184 +258,333 @@ body{
   }
 
   .reader{
-    box-shadow:0 0 0 1px #eee;
+    box-shadow:
+      0 0 0 1px #eee;
   }
+
 }
+
 </style>
 </head>
 
+
 <body>
 
-<nav class="top" aria-label="회차 선택">
-  <div class="episodes" id="episodes"></div>
+
+<!-- =========================
+     상단 회차
+========================= -->
+
+<nav
+  class="top"
+  aria-label="회차 선택"
+>
+
+<div class="episodes">
+
+  <button
+    type="button"
+    class="episode-button active"
+    data-episode="1"
+  >
+    1화
+  </button>
+
+  <button
+    type="button"
+    class="episode-button"
+    data-episode="2"
+  >
+    2화
+  </button>
+
+  <button
+    type="button"
+    class="episode-button"
+    data-episode="3"
+  >
+    3화
+  </button>
+
+  <button
+    type="button"
+    class="episode-button"
+    data-episode="4"
+  >
+    4화
+  </button>
+
+  <button
+    type="button"
+    class="episode-button"
+    data-episode="5"
+  >
+    5화
+  </button>
+
+</div>
+
 </nav>
 
-<main class="reader" id="reader"></main>
 
-<div class="episode-end" id="episodeEnd"></div>
+<!-- =========================
+     만화
+========================= -->
+
+<main
+  class="reader"
+  id="reader"
+>
+
+  <img
+    class="page"
+    id="page1"
+    src="01-1.png"
+    alt="1화 1페이지"
+  >
+
+  <img
+    class="page"
+    id="page2"
+    src="01-2.png"
+    alt="1화 2페이지"
+  >
+
+</main>
+
+
+<!-- =========================
+     다음 화
+========================= -->
+
+<div
+  class="episode-end"
+  id="episodeEnd"
+>
+
+  <button
+    type="button"
+    class="next-episode"
+    id="nextEpisode"
+  >
+    2화 보기 →
+  </button>
+
+</div>
+
 
 <footer class="footer">
-  부산진교회 초등2부
+
+부산진교회 초등2부
+
 </footer>
 
 
 <script>
 
-/* ---------------------------------
-   기본 설정
---------------------------------- */
+/* =========================
+   브라우저 스크롤 복원 방지
+========================= */
 
-if('scrollRestoration' in history){
-  history.scrollRestoration = 'manual';
+if(
+  'scrollRestoration'
+  in history
+){
+  history.scrollRestoration =
+    'manual';
 }
 
+
+/* =========================
+   요소
+========================= */
+
 const total = 5;
-
-const episodes =
-  document.getElementById('episodes');
-
-const reader =
-  document.getElementById('reader');
-
-const episodeEnd =
-  document.getElementById('episodeEnd');
 
 let currentEpisode = 1;
 
 let changing = false;
 
 
-/* ---------------------------------
-   파일 이름
---------------------------------- */
+const reader =
+  document.getElementById(
+    'reader'
+  );
 
-function imageSources(ep){
+
+const page1 =
+  document.getElementById(
+    'page1'
+  );
+
+
+const page2 =
+  document.getElementById(
+    'page2'
+  );
+
+
+const episodeEnd =
+  document.getElementById(
+    'episodeEnd'
+  );
+
+
+const buttons =
+  Array.from(
+    document.querySelectorAll(
+      '.episode-button'
+    )
+  );
+
+
+/* =========================
+   이미지 주소
+========================= */
+
+function getSources(ep){
 
   const number =
-    String(ep).padStart(2,'0');
+    String(ep)
+    .padStart(2,'0');
 
   return [
+
     number + '-1.png',
+
     number + '-2.png'
+
   ];
+
 }
 
 
-/* ---------------------------------
-   이미지 한 장 미리 로드
---------------------------------- */
+/* =========================
+   이미지 미리 준비
+========================= */
 
-function preloadImage(src){
+function preload(src){
 
-  return new Promise(function(resolve,reject){
+  return new Promise(
+    function(resolve,reject){
 
-    const img = new Image();
+      const image =
+        new Image();
 
-    img.onload = function(){
-      resolve(src);
-    };
+      image.onload =
+        function(){
 
-    img.onerror = function(){
-      reject(src);
-    };
+          resolve();
 
-    img.src = src;
+        };
 
-    /* 이미 캐시에 있을 경우 */
-    if(img.complete){
+      image.onerror =
+        function(){
 
-      resolve(src);
+          reject();
+
+        };
+
+      image.src = src;
+
+
+      if(image.complete){
+
+        resolve();
+
+      }
 
     }
-
-  });
-
-}
-
-
-/* ---------------------------------
-   한 화 이미지 모두 준비
---------------------------------- */
-
-function preloadEpisode(ep){
-
-  const sources = imageSources(ep);
-
-  return Promise.all([
-    preloadImage(sources[0]),
-    preloadImage(sources[1])
-  ]);
+  );
 
 }
 
 
-/* ---------------------------------
-   상단 회차 버튼
---------------------------------- */
+/* =========================
+   선택된 회차 표시
 
-function drawEpisodeButtons(){
+   버튼을 새로 만들지 않는다.
+   기존 버튼의 class만 변경.
+========================= */
 
-  episodes.innerHTML = '';
+function setActiveButton(ep){
 
-  for(let i=1; i<=total; i++){
+  buttons.forEach(
+    function(button){
 
-    const button =
-      document.createElement('button');
+      const number =
+        Number(
+          button.dataset.episode
+        );
 
-    button.type = 'button';
+      if(number === ep){
 
-    button.textContent = i + '화';
+        button.classList.add(
+          'active'
+        );
 
-    if(i === currentEpisode){
-      button.className = 'active';
+      }else{
+
+        button.classList.remove(
+          'active'
+        );
+
+      }
+
+      /*
+      모바일 브라우저의
+      focus 잔상 제거
+      */
+
+      button.blur();
+
     }
+  );
 
-    button.addEventListener(
+}
+
+
+/* =========================
+   하단 버튼
+========================= */
+
+function updateBottom(ep){
+
+  if(ep < total){
+
+    episodeEnd.innerHTML =
+      '<button ' +
+      'type="button" ' +
+      'class="next-episode" ' +
+      'id="nextEpisode">' +
+
+      (ep + 1) +
+
+      '화 보기 →' +
+
+      '</button>';
+
+
+    const next =
+      document.getElementById(
+        'nextEpisode'
+      );
+
+
+    next.addEventListener(
       'click',
       function(){
 
-        changeEpisode(i);
+        changeEpisode(
+          ep + 1
+        );
 
       }
     );
 
-    episodes.appendChild(button);
-
   }
 
-}
-
-
-/* ---------------------------------
-   하단 다음 화 버튼
---------------------------------- */
-
-function drawNextButton(){
-
-  if(currentEpisode < total){
-
-    episodeEnd.innerHTML =
-      '<button type="button" ' +
-      'class="next-episode" ' +
-      'id="nextEpisode">' +
-      (currentEpisode + 1) +
-      '화 보기 →' +
-      '</button>';
-
-    document
-      .getElementById('nextEpisode')
-      .addEventListener(
-        'click',
-        function(){
-
-          changeEpisode(
-            currentEpisode + 1
-          );
-
-        }
-      );
-
-  }else{
+  else{
 
     episodeEnd.innerHTML =
       '<div class="the-end">' +
@@ -333,70 +596,9 @@ function drawNextButton(){
 }
 
 
-/* ---------------------------------
-   실제 이미지 표시
-
-   중요:
-   새 이미지가 준비된 다음에만
-   기존 화면을 교체합니다.
---------------------------------- */
-
-function displayEpisode(ep){
-
-  const sources =
-    imageSources(ep);
-
-  const fragment =
-    document.createDocumentFragment();
-
-
-  const image1 =
-    document.createElement('img');
-
-  image1.className = 'page';
-
-  image1.src = sources[0];
-
-  image1.alt =
-    ep + '화 1페이지';
-
-
-  const image2 =
-    document.createElement('img');
-
-  image2.className = 'page';
-
-  image2.src = sources[1];
-
-  image2.alt =
-    ep + '화 2페이지';
-
-
-  fragment.appendChild(image1);
-
-  fragment.appendChild(image2);
-
-
-  /*
-     먼저 새 이미지 객체를 완성한 후
-     기존 만화를 한 번에 교체
-  */
-
-  reader.replaceChildren(fragment);
-
-
-  currentEpisode = ep;
-
-  drawEpisodeButtons();
-
-  drawNextButton();
-
-}
-
-
-/* ---------------------------------
+/* =========================
    회차 변경
---------------------------------- */
+========================= */
 
 async function changeEpisode(ep){
 
@@ -413,47 +615,93 @@ async function changeEpisode(ep){
   changing = true;
 
 
+  const sources =
+    getSources(ep);
+
+
   try{
 
     /*
-       현재 만화는 그대로 둔 상태에서
-       새 화의 이미지 두 장을 준비
+    새 화 이미지가 준비될 때까지
+    현재 화면 유지
     */
 
-    await preloadEpisode(ep);
+    await Promise.all([
+
+      preload(sources[0]),
+
+      preload(sources[1])
+
+    ]);
 
 
     /*
-       이미지 준비가 끝난 뒤
-       맨 위로 이동
+    먼저 최상단으로 이동
     */
 
     window.scrollTo(0,0);
 
 
     /*
-       그 다음 화면 교체
+    기존 IMG 요소 자체는
+    없애지 않고 src만 변경
     */
 
-    displayEpisode(ep);
+    page1.src =
+      sources[0];
+
+    page1.alt =
+      ep +
+      '화 1페이지';
+
+
+    page2.src =
+      sources[1];
+
+    page2.alt =
+      ep +
+      '화 2페이지';
+
+
+    currentEpisode = ep;
 
 
     /*
-       모바일 브라우저의 렌더링 타이밍에
-       영향을 받지 않도록 한 번 더 확인
+    검은 버튼 이동
     */
 
-    requestAnimationFrame(function(){
-
-      window.scrollTo(0,0);
-
-    });
+    setActiveButton(ep);
 
 
-  }catch(error){
+    /*
+    하단 버튼 변경
+    */
+
+    updateBottom(ep);
+
+
+    /*
+    모바일 렌더링 후
+    위치 재확인
+    */
+
+    requestAnimationFrame(
+      function(){
+
+        window.scrollTo(
+          0,
+          0
+        );
+
+      }
+    );
+
+  }
+
+  catch(error){
 
     console.error(
-      '이미지를 불러오지 못했습니다.',
+      '이미지 로딩 오류',
       error
     );
 
@@ -465,71 +713,37 @@ async function changeEpisode(ep){
 }
 
 
-/* ---------------------------------
-   최초 1화 표시
---------------------------------- */
+/* =========================
+   상단 버튼 이벤트
 
-function start(){
+   버튼은 처음 만들어진
+   그대로 계속 사용
+========================= */
 
-  currentEpisode = 1;
+buttons.forEach(
+  function(button){
 
-  displayEpisode(1);
+    button.addEventListener(
+      'click',
+      function(){
 
-  window.scrollTo(0,0);
+        const ep =
+          Number(
+            button.dataset.episode
+          );
 
+        changeEpisode(ep);
 
-  /*
-     1화가 표시된 후
-     나머지 화를 백그라운드에서
-     차례로 미리 받아둠
-  */
+      }
+    );
 
-  setTimeout(function(){
-
-    for(let i=2; i<=total; i++){
-
-      preloadEpisode(i)
-        .catch(function(){});
-
-    }
-
-  },300);
-
-}
+  }
+);
 
 
-/* ---------------------------------
-   시작
---------------------------------- */
-
-/*
-   예전 #episode-2 같은 주소가
-   남아 있다면 제거
-*/
-
-if(location.hash){
-
-  history.replaceState(
-    null,
-    '',
-    location.pathname +
-    location.search
-  );
-
-}
-
-
-/*
-   첫 화면 시작
-*/
-
-start();
-
-
-/*
-   페이지 전체 로딩 후에도
-   첫 접속 위치는 최상단
-*/
+/* =========================
+   2~5화 백그라운드 준비
+========================= */
 
 window.addEventListener(
   'load',
@@ -537,10 +751,73 @@ window.addEventListener(
 
     window.scrollTo(0,0);
 
+
+    setTimeout(
+      function(){
+
+        for(
+          let ep=2;
+          ep<=total;
+          ep++
+        ){
+
+          const sources =
+            getSources(ep);
+
+          preload(
+            sources[0]
+          ).catch(
+            function(){}
+          );
+
+          preload(
+            sources[1]
+          ).catch(
+            function(){}
+          );
+
+        }
+
+      },
+      500
+    );
+
   }
 );
 
+
+/* =========================
+   예전 hash 제거
+========================= */
+
+if(location.hash){
+
+  history.replaceState(
+
+    null,
+
+    '',
+
+    location.pathname +
+    location.search
+
+  );
+
+}
+
+
+/* =========================
+   첫 화면
+========================= */
+
+currentEpisode = 1;
+
+setActiveButton(1);
+
+window.scrollTo(0,0);
+
 </script>
+
 
 </body>
 </html>
