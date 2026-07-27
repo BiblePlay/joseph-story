@@ -13,7 +13,7 @@
 }
 
 html{
-  scroll-behavior:smooth;
+  scroll-behavior:auto;
 }
 
 body{
@@ -36,7 +36,7 @@ body{
   z-index:10;
   background:rgba(255,255,255,.97);
   border-bottom:1px solid #e8e8e8;
-  padding:8px 8px;
+  padding:8px;
 }
 
 .episodes{
@@ -78,7 +78,7 @@ body{
   padding:0;
 }
 
-/* 한 화가 끝난 뒤 영역 */
+/* 화 마지막 영역 */
 .episode-end{
   max-width:860px;
   margin:0 auto;
@@ -86,7 +86,7 @@ body{
   background:#fff;
 }
 
-/* 다음 화 큰 버튼 */
+/* 다음 화 버튼 */
 .next-episode{
   display:block;
   width:100%;
@@ -119,7 +119,7 @@ body{
   padding:22px 10px 30px;
 }
 
-/* PC */
+/* PC 화면 */
 @media(min-width:861px){
 
   body{
@@ -158,58 +158,48 @@ body{
 
 <script>
 
+/* 브라우저가 이전 스크롤 위치를 자동 복원하지 않도록 설정 */
+if('scrollRestoration' in history){
+  history.scrollRestoration = 'manual';
+}
+
 const total = 5;
 
 const episodes = document.getElementById('episodes');
 const reader = document.getElementById('reader');
 const episodeEnd = document.getElementById('episodeEnd');
 
-
-/* 현재 회차 확인 */
-function requestedEpisode(){
-
-  const m = location.hash.match(/episode-(\d+)/);
-
-  return Math.min(
-    total,
-    Math.max(1, m ? Number(m[1]) : 1)
-  );
-}
+let currentEpisode = 1;
 
 
-/* 회차 이동 */
-function goEpisode(number){
+/* 회차 화면 만들기 */
+function renderEpisode(ep, moveToTop = true){
 
-  location.hash = 'episode-' + number;
+  currentEpisode = ep;
 
-}
-
-
-/* 화면 만들기 */
-function render(ep, scroll = true){
-
-  /* 상단 회차 버튼 */
+  /* 상단 1~5화 버튼 */
   episodes.innerHTML = '';
 
   for(let i = 1; i <= total; i++){
 
     const button = document.createElement('button');
 
+    button.type = 'button';
     button.textContent = i + '화';
 
     if(i === ep){
       button.className = 'active';
     }
 
-    button.onclick = () => {
-      goEpisode(i);
-    };
+    button.addEventListener('click', function(){
+      changeEpisode(i);
+    });
 
     episodes.appendChild(button);
   }
 
 
-  /* 이미지 */
+  /* 해당 화 이미지 2장 */
   const number = String(ep).padStart(2,'0');
 
   reader.innerHTML =
@@ -218,7 +208,6 @@ function render(ep, scroll = true){
       src="${number}-1.png"
       alt="${ep}화 1페이지"
     >` +
-
     `<img
       class="page"
       src="${number}-2.png"
@@ -226,16 +215,23 @@ function render(ep, scroll = true){
     >`;
 
 
-  /* 하단 버튼 */
+  /* 다음 화 버튼 */
   if(ep < total){
 
     episodeEnd.innerHTML =
       `<button
+        type="button"
         class="next-episode"
-        onclick="goEpisode(${ep + 1})"
+        id="nextEpisode"
       >
         ${ep + 1}화 보기 →
       </button>`;
+
+    document
+      .getElementById('nextEpisode')
+      .addEventListener('click', function(){
+        changeEpisode(ep + 1);
+      });
 
   }else{
 
@@ -246,29 +242,61 @@ function render(ep, scroll = true){
   }
 
 
-  /* 다른 화를 선택하면 맨 위부터 */
-  if(scroll){
+  /* 회차를 바꾸면 항상 최상단 */
+  if(moveToTop){
 
-    window.scrollTo({
-      top:0,
-      left:0,
-      behavior:'instant'
+    window.scrollTo(0,0);
+
+    requestAnimationFrame(function(){
+      window.scrollTo(0,0);
     });
 
   }
-
 }
 
 
-/* 회차가 바뀌었을 때 */
-window.addEventListener(
-  'hashchange',
-  () => render(requestedEpisode(), true)
-);
+/* 회차 변경 */
+function changeEpisode(ep){
+
+  if(ep < 1 || ep > total){
+    return;
+  }
+
+  renderEpisode(ep,true);
+}
 
 
-/* 처음 열었을 때 */
-render(requestedEpisode(), false);
+/* 최초 접속 */
+
+/* 기존 주소에 #episode-2 등이 남아 있다면 제거 */
+if(location.hash){
+  history.replaceState(
+    null,
+    '',
+    location.pathname + location.search
+  );
+}
+
+/* 처음에는 무조건 1화 */
+renderEpisode(1,false);
+
+/* 첫 화면 위치를 최상단으로 확실하게 고정 */
+window.scrollTo(0,0);
+
+requestAnimationFrame(function(){
+  window.scrollTo(0,0);
+});
+
+/* 이미지 로딩 완료 후에도 한 번 더 최상단 확인 */
+window.addEventListener('load',function(){
+
+  window.scrollTo(0,0);
+
+  setTimeout(function(){
+    window.scrollTo(0,0);
+  },50);
+
+});
 
 </script>
 
