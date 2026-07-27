@@ -4,27 +4,39 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
+
 <title>요셉과 형제들</title>
 
 <style>
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
 
 body{
   margin:0;
   background:#fff;
   color:#111;
-  font-family:-apple-system,BlinkMacSystemFont,
-  "Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Apple SD Gothic Neo",
+    "Noto Sans KR",
+    "Malgun Gothic",
+    sans-serif;
 }
 
+/* 상단 회차 메뉴 */
 .top{
   position:sticky;
   top:0;
   z-index:10;
-  background:rgba(255,255,255,.96);
+  background:rgba(255,255,255,.97);
   border-bottom:1px solid #e8e8e8;
-  padding:8px 10px;
+  padding:8px 8px;
 }
 
 .episodes{
@@ -32,14 +44,14 @@ body{
   margin:auto;
   display:grid;
   grid-template-columns:repeat(5,1fr);
-  gap:6px;
+  gap:5px;
 }
 
 .episodes button{
   border:1px solid #d7d7d7;
   background:#fff;
-  border-radius:8px;
-  padding:8px 2px;
+  border-radius:9px;
+  padding:9px 2px;
   font-size:14px;
   font-weight:650;
   cursor:pointer;
@@ -51,9 +63,11 @@ body{
   border-color:#111;
 }
 
+/* 만화 */
 .reader{
   max-width:860px;
   margin:0 auto;
+  background:#fff;
 }
 
 .page{
@@ -64,41 +78,66 @@ body{
   padding:0;
 }
 
-.controls{
+/* 한 화가 끝난 뒤 영역 */
+.episode-end{
   max-width:860px;
   margin:0 auto;
-  padding:18px 12px 8px;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
+  padding:22px 14px 8px;
+  background:#fff;
 }
 
-.controls button{
-  border:1px solid #d8d8d8;
-  background:#fafafa;
-  border-radius:9px;
-  padding:12px 6px;
-  font-size:14px;
+/* 다음 화 큰 버튼 */
+.next-episode{
+  display:block;
+  width:100%;
+  border:0;
+  background:#111;
+  color:#fff;
+  border-radius:12px;
+  padding:17px 10px;
+  font-size:18px;
+  font-weight:700;
   cursor:pointer;
 }
 
-.controls button:disabled{
-  opacity:.3;
+/* 마지막 화 */
+.the-end{
+  text-align:center;
+  padding:10px 10px 4px;
+  font-size:16px;
+  font-weight:650;
+  color:#555;
 }
 
+/* 교회명 */
 .footer{
   text-align:center;
   color:#777;
-  font-size:17px;
+  font-size:16px;
+  font-weight:500;
   letter-spacing:.02em;
-  padding:12px 10px 28px;
+  padding:22px 10px 30px;
 }
 
+/* PC */
 @media(min-width:861px){
-  body{background:#f3f3f3}
-  .top{background:rgba(255,255,255,.97)}
-  .reader,.controls{background:#fff}
-  .reader{box-shadow:0 0 0 1px #eee}
+
+  body{
+    background:#f3f3f3;
+  }
+
+  .reader,
+  .episode-end{
+    background:#fff;
+  }
+
+  .reader{
+    box-shadow:0 0 0 1px #eee;
+  }
+
+  .top{
+    background:rgba(255,255,255,.97);
+  }
 }
 </style>
 </head>
@@ -111,85 +150,126 @@ body{
 
 <main class="reader" id="reader"></main>
 
-<div class="controls">
-  <button id="prev">← 이전 화</button>
-  <button id="next">다음 화 →</button>
-</div>
+<div class="episode-end" id="episodeEnd"></div>
 
 <footer class="footer">
   부산진교회 초등2부
 </footer>
 
 <script>
-const total=5;
 
-const episodes=document.getElementById('episodes');
-const reader=document.getElementById('reader');
-const prev=document.getElementById('prev');
-const next=document.getElementById('next');
+const total = 5;
 
+const episodes = document.getElementById('episodes');
+const reader = document.getElementById('reader');
+const episodeEnd = document.getElementById('episodeEnd');
+
+
+/* 현재 회차 확인 */
 function requestedEpisode(){
-  const m=location.hash.match(/episode-(\d+)/);
+
+  const m = location.hash.match(/episode-(\d+)/);
+
   return Math.min(
     total,
-    Math.max(1,m?Number(m[1]):1)
+    Math.max(1, m ? Number(m[1]) : 1)
   );
 }
 
-function render(ep,scroll=true){
 
-  episodes.innerHTML='';
+/* 회차 이동 */
+function goEpisode(number){
 
-  for(let i=1;i<=total;i++){
+  location.hash = 'episode-' + number;
 
-    const b=document.createElement('button');
-
-    b.textContent=i+'화';
-    b.className=i===ep?'active':'';
-
-    b.onclick=()=>{
-      location.hash='episode-'+i;
-    };
-
-    episodes.appendChild(b);
-  }
-
-  const number=String(ep).padStart(2,'0');
-
-  reader.innerHTML=
-    `<img class="page"
-          src="${number}-1.png"
-          alt="${ep}화 1페이지">`+
-    `<img class="page"
-          src="${number}-2.png"
-          alt="${ep}화 2페이지">`;
-
-  prev.disabled=ep===1;
-  next.disabled=ep===total;
-
-  prev.onclick=()=>{
-    if(ep>1){
-      location.hash='episode-'+(ep-1);
-    }
-  };
-
-  next.onclick=()=>{
-    if(ep<total){
-      location.hash='episode-'+(ep+1);
-    }
-  };
-
-  if(scroll){
-    window.scrollTo(0,0);
-  }
 }
 
+
+/* 화면 만들기 */
+function render(ep, scroll = true){
+
+  /* 상단 회차 버튼 */
+  episodes.innerHTML = '';
+
+  for(let i = 1; i <= total; i++){
+
+    const button = document.createElement('button');
+
+    button.textContent = i + '화';
+
+    if(i === ep){
+      button.className = 'active';
+    }
+
+    button.onclick = () => {
+      goEpisode(i);
+    };
+
+    episodes.appendChild(button);
+  }
+
+
+  /* 이미지 */
+  const number = String(ep).padStart(2,'0');
+
+  reader.innerHTML =
+    `<img
+      class="page"
+      src="${number}-1.png"
+      alt="${ep}화 1페이지"
+    >` +
+
+    `<img
+      class="page"
+      src="${number}-2.png"
+      alt="${ep}화 2페이지"
+    >`;
+
+
+  /* 하단 버튼 */
+  if(ep < total){
+
+    episodeEnd.innerHTML =
+      `<button
+        class="next-episode"
+        onclick="goEpisode(${ep + 1})"
+      >
+        ${ep + 1}화 보기 →
+      </button>`;
+
+  }else{
+
+    episodeEnd.innerHTML =
+      `<div class="the-end">
+        요셉과 형제들 · 끝
+      </div>`;
+  }
+
+
+  /* 다른 화를 선택하면 맨 위부터 */
+  if(scroll){
+
+    window.scrollTo({
+      top:0,
+      left:0,
+      behavior:'instant'
+    });
+
+  }
+
+}
+
+
+/* 회차가 바뀌었을 때 */
 window.addEventListener(
   'hashchange',
-  ()=>render(requestedEpisode(),true)
+  () => render(requestedEpisode(), true)
 );
 
-render(requestedEpisode(),false);
+
+/* 처음 열었을 때 */
+render(requestedEpisode(), false);
+
 </script>
 
 </body>
